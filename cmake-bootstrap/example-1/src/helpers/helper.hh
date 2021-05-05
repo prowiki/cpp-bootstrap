@@ -1,0 +1,1 @@
+void print_plus_one(int x);
