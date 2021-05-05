@@ -1,3 +1,3 @@
 # cpp-bootstrap
 
-- [cmake](./cmake-bootstrap/readme.md)
+- [cmake](./cmake-bootstrap)
