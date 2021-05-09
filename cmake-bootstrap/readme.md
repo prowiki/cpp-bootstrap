@@ -44,6 +44,8 @@ See [Installing CMake](https://cliutils.gitlab.io/modern-cmake/chapters/intro/in
 
 In `build/`, run `cmake ..` to generate `Makefile` and then run `make` to build the project.
 
+CMake respects environment variables `CC` and `CXX` to determine which compilers will be used. By default, CMake can detect the compilers itself while running `cmake ..`. However, to specify the compilers, we can run e.g. `CXX=$(which clang++) cmake ..` to force it to use clang++. *ref*: [switching-between-gcc-and-clang-llvm-using-cmake](https://stackoverflow.com/questions/7031126/switching-between-gcc-and-clang-llvm-using-cmake)
+
 #### Intro
 
 In the project root directory:
