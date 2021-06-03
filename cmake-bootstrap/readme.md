@@ -9,6 +9,9 @@
       - [Project Structure](#project-structure)
       - [Intro](#intro)
       - [CMakeLists.txt](#cmakeliststxt)
+    - [Example-2: Use external libraries](#example-2-use-external-libraries)
+      - [Project Structure](#project-structure-1)
+      - [CMakeLists.txt](#cmakeliststxt-1)
 
 ## Install CMake
 
@@ -122,3 +125,55 @@ aux_source_directory(. DIR_LIB_SRCS)
 # build library from all source files
 add_library (helper ${DIR_LIB_SRCS})
 ```
+
+### Example-2: Use external libraries
+
+#### Project Structure
+
+```
+.
+├── build
+├── boost_1_76_0
+├── CMakeLists.txt
+└── src
+    ├── use_boost.cc
+```
+
+1. [download boost](https://www.boost.org/users/download/) and extract it to get `boost_1_76_0`. In practice, we probably want to add boost as a submodule.
+2. `use_boost.cc` is an inter-process shared memory example from [boost official docs](https://www.boost.org/doc/libs/1_49_0/doc/html/interprocess/sharedmemorybetweenprocesses.html).
+
+
+#### CMakeLists.txt
+
+1. `CMakeLists.txt`
+
+```cmake
+cmake_minimum_required(VERSION 3.13)
+
+project(template__study)
+
+set(CMAKE_CXX_STANDARD 17)
+
+# this shows the commands used to compile the code
+SET (CMAKE_VERBOSE_MAKEFILE 1)
+
+# add boost to the include-path and lib-path if it's not intalled
+SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "boost_1_76_0/")
+SET(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "boost_1_76_0/libs")
+
+# some boost flags
+set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
+
+# cmake has a command `find_package` can help find boost and set `Boost_FOUND`
+find_package(Boost 1.76.0)
+
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    add_executable(use_boost src/use_boost.cc)
+    target_link_libraries(use_boost ${Boost_LIBRARIES} rt)
+endif()
+```
+
+Note `rt` in `target_link_libraries(use_boost ${Boost_LIBRARIES} rt)`. The link command is `/usr/bin/c++ CMakeFiles/use_boost.dir/src/use_boost.cc.o  -o use_boost  -lrt`. The `-lrt` means to link `librt`. *ref*: [what-library-does-ld-option-lrt-refer-to](https://stackoverflow.com/questions/6754032/what-library-does-ld-option-lrt-refer-to-bionic-libc). And the only reason why we need it is because the code is using some shared memory features.
