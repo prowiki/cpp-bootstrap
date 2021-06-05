@@ -12,6 +12,9 @@
     - [Example-2: Use external libraries](#example-2-use-external-libraries)
       - [Project Structure](#project-structure-1)
       - [CMakeLists.txt](#cmakeliststxt-1)
+    - [Example-3: Test with Catch2](#example-3-test-with-catch2)
+      - [Project Structure](#project-structure-2)
+      - [CMakeLists.txt](#cmakeliststxt-2)
 
 ## Install CMake
 
@@ -177,3 +180,42 @@ endif()
 ```
 
 Note `rt` in `target_link_libraries(use_boost ${Boost_LIBRARIES} rt)`. The link command is `/usr/bin/c++ CMakeFiles/use_boost.dir/src/use_boost.cc.o  -o use_boost  -lrt`. The `-lrt` means to link `librt`. *ref*: [what-library-does-ld-option-lrt-refer-to](https://stackoverflow.com/questions/6754032/what-library-does-ld-option-lrt-refer-to-bionic-libc). And the only reason why we need it is because the code is using some shared memory features.
+
+### Example-3: Test with Catch2
+
+#### Project Structure
+
+```
+.
+├── CMakeLists.txt
+├── build
+├── externals
+│   └── catch2
+│       ├── CMakeLists.txt
+│       └── catch.hpp
+├── src
+│   └── common_utils
+│       ├── CMakeLists.txt
+│       ├── math_utils.cc
+│       └── math_utils.hh
+└── tests
+    └── common_utils
+        ├── CMakeLists.txt
+        ├── test_main.cc
+        └── test_math_utils.cc
+```
+
+1. I'm using `Catch2` to help write tests. Download the header-only Catch2 from [Catch2 releases](https://github.com/catchorg/Catch2/releases).
+2. In `externals/catch2`, I write a `CMakeLists.txt` to make catch2 an interface so that we can just link it to each of our `test-main`.
+3. I only write a single lib `common_utils` and the corresponding test as an example, but we can add as many libs as we want.
+
+#### CMakeLists.txt
+
+I'm using `ctest` which should be installed with `cmake` to manage the tests.
+
+```cmake
+# add tests
+# run `ctest` to run the added tests; run with `--output-on-failure` to output failures
+include(CTest)
+add_test(NAME TestCommonUtils COMMAND test_common_utils)
+```
